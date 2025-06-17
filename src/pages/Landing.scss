@@ -1,39 +1,172 @@
-.landing {
+@use "../App.scss" as *;
+@use "sass:color";
+
+.landing-page {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 4rem;
   min-height: 100vh;
-  background: linear-gradient(to right, #667eea, #764ba2);
+  width: 100%;
+  background: linear-gradient(
+      rgba(0, 0, 0, 0.5), 
+      rgba(0, 0, 0, 0.5)
+    ),
+    url("../assets/book23.jpg") center center / cover no-repeat;
   color: #fff;
   text-align: center;
+  scroll-behavior: smooth;
 
-  h1 {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-  }
-
-  p {
-    font-size: 1.2rem;
-    margin-bottom: 2rem;
-  }
-
-  .buttons {
+  .navbar {
     display: flex;
-    gap: 1rem;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background-color: rgba(0, 0, 0, 0.4);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+
+    .logo {
+      font-size: 1.75rem;
+      font-weight: bold;
+      color: $primary-color;
+    }
+
+    .nav-links {
+      list-style: none;
+      display: flex;
+      gap: 1.5rem;
+
+      li a {
+        color: #fff;
+        font-weight: 500;
+        text-decoration: none;
+        transition: color 0.3s ease;
+
+        &:hover {
+          color: $secondary-color;
+        }
+      }
+    }
+  }
+
+  .content {
+    padding: 6rem 2rem 4rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    h1 {
+      font-size: 3rem;
+      font-weight: bold;
+      margin-bottom: 1rem;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6);
+    }
+
+    p {
+      font-size: 1.25rem;
+      max-width: 700px;
+      margin-bottom: 2.5rem;
+      text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+      line-height: 1.6;
+    }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+
+      a {
+        padding: 0.85rem 1.75rem;
+        background-color: $primary-color;
+        color: #fff;
+        border-radius: 8px;
+        font-weight: bold;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+
+        &:hover {
+          background-color: color.adjust($primary-color, $lightness: -10%);
+        }
+      }
+    }
+  }
+
+  .section {
+    padding: 3rem 2rem;
+    background-color: rgba(0, 0, 0, 0.55);
+    margin: 2rem auto;
+    border-radius: 12px;
+    max-width: 960px;
+
+    h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      color: #fff;
+    }
+
+    p {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: #e2e8f0;
+    }
 
     a {
-      padding: 0.8rem 1.5rem;
-      background-color: #fff;
-      color: #4c51bf;
-      border-radius: 6px;
-      font-weight: bold;
-      text-decoration: none;
-      transition: background-color 0.3s;
+      color: #ffd700;
+      text-decoration: underline;
+    }
+  }
+
+  footer {
+    background-color: rgba(0, 0, 0, 0.4);
+    padding: 1.25rem;
+    text-align: center;
+    font-size: 0.95rem;
+
+    p {
+      margin: 0.2rem 0;
+      color: #e2e8f0;
+    }
+
+    a {
+      color: #ffd700;
+      text-decoration: underline;
 
       &:hover {
-        background-color: #edf2ff;
+        text-decoration: none;
       }
     }
   }
 }
+
+// 🌐 Responsive Tweaks
+@media (max-width: 768px) {
+  .landing-page {
+    .navbar {
+      flex-direction: column;
+      align-items: flex-start;
+
+      .nav-links {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+    }
+
+    .content {
+      h1 {
+        font-size: 2.25rem;
+      }
+
+      p {
+        font-size: 1.1rem;
+      }
+    }
+
+    .buttons a {
+      width: 100%;
+      text-align: center;
+    }
+  }
+}
+
+

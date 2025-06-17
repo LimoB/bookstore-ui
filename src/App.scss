@@ -1,27 +1,63 @@
 // src/App.scss
 
-$primary-color: #4c51bf; // Indigo-600
-$secondary-color: #6b46c1; // Purple-600
-$text-color: #2d3748; // Gray-800
-$bg-color: #f0f4ff; // Light indigo background
+@use "sass:color"; // 🔄 Use modern Sass color module
+
+// 🎨 Color Palette
+$primary-color: #4c51bf;      // Indigo-600
+$secondary-color: #6b46c1;    // Purple-600
+$text-color: #2d3748;         // Gray-800
+$bg-color: #f0f4ff;           // Light indigo background
 $card-bg: #ffffff;
 $card-shadow: 0 6px 18px rgba(108, 122, 224, 0.15);
 
+// 📏 Spacing
+$padding-xl: 3rem;
+$padding-lg: 2rem;
+$padding-md: 1.5rem;
+$padding-sm: 1rem;
+$padding-xs: 0.5rem;
+
+// 🌐 Global App Styles
 .app {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   text-align: center;
-  padding: 2rem;
+  padding: $padding-lg;
   background-color: $bg-color;
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 2rem;
 
+  h1 {
+    color: $primary-color;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  p.description {
+    color: $text-color;
+    font-size: 1.2rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  // 📚 Book Card
   .book {
     background: $card-bg;
-    padding: 1.75rem;
+    padding: $padding-md;
     border-radius: 12px;
     width: 320px;
-    margin: 2rem auto;
+    margin: 1.5rem auto;
     box-shadow: $card-shadow;
-    border: 1px solid #dbeafe; // soft border
+    border: 1px solid #dbeafe;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(76, 81, 191, 0.2);
+    }
 
     h2 {
       color: $primary-color;
@@ -34,5 +70,42 @@ $card-shadow: 0 6px 18px rgba(108, 122, 224, 0.15);
       margin: 0.5rem 0;
       color: $text-color;
     }
+  }
+
+  // 🔘 Buttons (if needed globally)
+  .button {
+    padding: 0.75rem 1.5rem;
+    background-color: $primary-color;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s;
+
+    &:hover {
+      background-color: color.adjust($primary-color, $lightness: -10%);
+    }
+  }
+}
+
+// 📱 Responsive Adjustments
+@media (max-width: 400px) {
+  .app {
+    padding: $padding-sm;
+  }
+
+  .book {
+    width: 90%;
+    padding: $padding-sm;
+  }
+
+  .app h1 {
+    font-size: 2rem;
+  }
+
+  .app p.description {
+    font-size: 1rem;
+    padding: 0 0.5rem;
   }
 }

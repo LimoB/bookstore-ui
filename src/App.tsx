@@ -1,10 +1,10 @@
 import './App.scss';
-import { BookManager } from './components/Book';
+import AppRoutes from './routes/AppRoutes';
 
 function App() {
   return (
     <div className="app-wrapper">
-      <BookManager />
+      <AppRoutes />
     </div>
   );
 }
