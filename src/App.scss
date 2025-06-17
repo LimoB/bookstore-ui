@@ -1,0 +1,38 @@
+// src/App.scss
+
+$primary-color: #4c51bf; // Indigo-600
+$secondary-color: #6b46c1; // Purple-600
+$text-color: #2d3748; // Gray-800
+$bg-color: #f0f4ff; // Light indigo background
+$card-bg: #ffffff;
+$card-shadow: 0 6px 18px rgba(108, 122, 224, 0.15);
+
+.app {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  text-align: center;
+  padding: 2rem;
+  background-color: $bg-color;
+  min-height: 100vh;
+
+  .book {
+    background: $card-bg;
+    padding: 1.75rem;
+    border-radius: 12px;
+    width: 320px;
+    margin: 2rem auto;
+    box-shadow: $card-shadow;
+    border: 1px solid #dbeafe; // soft border
+
+    h2 {
+      color: $primary-color;
+      margin-bottom: 1rem;
+      font-size: 1.5rem;
+    }
+
+    p {
+      font-size: 1rem;
+      margin: 0.5rem 0;
+      color: $text-color;
+    }
+  }
+}
