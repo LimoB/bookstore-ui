@@ -50,7 +50,7 @@ const Login = () => {
           break;
         case "member":
         default:
-          navigate("/books");
+          navigate("");
           break;
       }
     } catch (err: any) {
