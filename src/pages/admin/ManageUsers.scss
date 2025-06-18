@@ -1,30 +1,155 @@
-// src/pages/admin/ManageUsers.scss
 .manage-users {
-  padding: 1rem;
+  padding: 2rem;
+  animation: fadeIn 0.5s ease-in;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f3e8ff 0%, #e0e7ff 100%);
 
   h2 {
-    margin-bottom: 1rem;
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+    color: #4c51bf;
+    animation: slideDown 0.4s ease;
   }
 
   button {
-    margin-right: 0.5rem;
-    padding: 0.3rem 0.6rem;
-    font-size: 0.9rem;
+    background-color: #6b46c1;
+    color: #fff;
+    border: none;
+    padding: 0.6rem 1rem;
+    font-size: 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-bottom: 1.5rem;
+    transition: background-color 0.3s, transform 0.2s;
+
+    &:hover {
+      background-color: #553c9a;
+      transform: translateY(-2px);
+    }
   }
 
   table {
     width: 100%;
-    margin-top: 1rem;
     border-collapse: collapse;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 0 12px rgba(0, 0, 0, 0.08);
+    background-color: #fff;
+    animation: scaleUp 0.3s ease;
 
-    th, td {
-      padding: 0.6rem;
-      border: 1px solid #ccc;
+    th,
+    td {
+      padding: 1rem;
       text-align: left;
+      border-bottom: 1px solid #e3e3e3;
     }
 
     th {
-      background-color: #f0f0f0;
+      background-color: #5a67d8;
+      color: #fff;
+      font-size: 1rem;
     }
+
+    td {
+      background-color: #fdfdfd;
+    }
+
+    tr:nth-child(even) td {
+      background-color: #f6f8ff;
+    }
+
+    tr:hover td {
+      background-color: #eef2ff;
+    }
+
+    td:last-child {
+      display: flex;
+      gap: 0.5rem;
+
+      button {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.8rem;
+      }
+
+      button:nth-child(1) {
+        background-color: #805ad5;
+
+        &:hover {
+          background-color: #6b46c1;
+        }
+      }
+
+      button:nth-child(2) {
+        background-color: #f56565;
+
+        &:hover {
+          background-color: #e53e3e;
+        }
+      }
+    }
+  }
+
+  p {
+    font-size: 1rem;
+    color: #4a5568;
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .manage-users {
+    padding: 1.5rem;
+
+    h2 {
+      font-size: 1.5rem;
+    }
+
+    button {
+      font-size: 0.9rem;
+      padding: 0.5rem 0.9rem;
+    }
+
+    table {
+      font-size: 0.9rem;
+
+      th,
+      td {
+        padding: 0.6rem;
+      }
+    }
+  }
+}
+
+// Animations
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
   }
 }

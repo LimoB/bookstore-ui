@@ -2,6 +2,9 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import type { JSX } from "react";
 import { useAuth } from "../hooks/useAuth";
 
+// Layouts
+import AdminLayout from "../layouts/AdminLayout";
+
 // Public pages
 import Landing from "../pages/Landing";
 import Login from "../pages/Login";
@@ -9,7 +12,7 @@ import Register from "../pages/Register";
 
 // Admin pages
 import AdminDashboard from "../pages/admin/AdminDashboard";
-import ManageAuthors  from "../pages/admin/ManageAuthors";
+import ManageAuthors from "../pages/admin/ManageAuthors";
 import { BookManager } from "../pages/admin/ManageBooks";
 import ManageUsers from "../pages/admin/ManageUsers";
 
@@ -49,47 +52,26 @@ const AppRoutes = () => {
         }
       />
 
-      {/* Admin-only Routes */}
+      {/* Admin Routes with Sidebar Layout */}
       <Route
-        path="/admin/dashboard"
+        path="/admin"
         element={
           <ProtectedRoute roles={["admin"]}>
-            <AdminDashboard />
+            <AdminLayout />
           </ProtectedRoute>
         }
-      />
-      <Route
-        path="/admin/authors"
-        element={
-          <ProtectedRoute roles={["admin"]}>
-            <ManageAuthors />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/admin/books"
-        element={
-          <ProtectedRoute roles={["admin"]}>
-            <BookManager />
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/admin/users"
-        element={
-          <ProtectedRoute roles={["admin"]}>
-            <ManageUsers />
-          </ProtectedRoute>
-        }
-      />
-
-      {/* Redirect /admin to dashboard */}
-      <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
+      >
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard" element={<AdminDashboard />} />
+        <Route path="authors" element={<ManageAuthors />} />
+        <Route path="books" element={<BookManager />} />
+        <Route path="users" element={<ManageUsers />} />
+      </Route>
 
       {/* Utility */}
       <Route path="/unauthorized" element={<Unauthorized />} />
 
-      {/* Catch-all 404 route */}
+      {/* Catch-all 404 */}
       <Route
         path="*"
         element={

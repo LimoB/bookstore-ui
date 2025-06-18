@@ -1,74 +1,109 @@
-// src/pages/admin/ManageAuthors.tsx
-import { useEffect, useState } from "react";
-import { fetchAuthors, deleteAuthor } from "../../services/author";
+import { useState } from "react";
+import {
+  useGetAllAuthorsQuery,
+  useCreateAuthorMutation,
+  useUpdateAuthorMutation,
+  useDeleteAuthorMutation,
+  type Author,
+} from "../../features/authorApi";
+import AuthorForm from "./components/AuthorForm";
 import "./ManageAuthors.scss";
 
-interface Author {
-  id: string;
-  name: string;
-  bio?: string;
-}
-
 export default function ManageAuthors() {
-  const [authors, setAuthors] = useState<Author[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const { data: authors = [], isLoading, error } = useGetAllAuthorsQuery();
+  const [createAuthor] = useCreateAuthorMutation();
+  const [updateAuthor] = useUpdateAuthorMutation();
+  const [deleteAuthor] = useDeleteAuthorMutation();
 
-  const loadAuthors = async () => {
-    try {
-      setLoading(true);
-      const res = await fetchAuthors();
-      setAuthors(res.data);
-    } catch (err) {
-      setError("Failed to load authors.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [showForm, setShowForm] = useState(false);
+  const [editingAuthor, setEditingAuthor] = useState<Author | null>(null);
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async (id: number) => {
     if (!confirm("Are you sure you want to delete this author?")) return;
     try {
-      await deleteAuthor(id);
-      setAuthors(authors.filter((a) => a.id !== id));
+      await deleteAuthor(id).unwrap();
     } catch {
       alert("Failed to delete author.");
     }
   };
 
-  useEffect(() => {
-    loadAuthors();
-  }, []);
+  const handleFormSubmit = async (author: Partial<Author>) => {
+    try {
+      if (editingAuthor) {
+        await updateAuthor({
+          id: editingAuthor.authorId,
+          data: {
+            authorName: author.authorName!,
+            genreId: author.genreId!,
+          },
+        }).unwrap();
+      } else {
+        await createAuthor({
+          authorName: author.authorName!,
+          genreId: author.genreId!,
+        }).unwrap();
+      }
+      setShowForm(false);
+      setEditingAuthor(null);
+    } catch {
+      alert("Failed to save author.");
+    }
+  };
 
   return (
     <div className="manage-authors">
-      <h2>Manage Authors</h2>
-      <button onClick={() => alert("TODO: Open author form")}>➕ Add Author</button>
+      <div className="author-table-wrapper">
+        <h2>Manage Authors</h2>
+        <button onClick={() => setShowForm(true)}>➕ Add Author</button>
 
-      {loading && <p>Loading...</p>}
-      {error && <p>{error}</p>}
+        {isLoading && <p>Loading...</p>}
+        {error && <p className="error">Failed to load authors.</p>}
 
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Bio</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {authors.map((author) => (
-            <tr key={author.id}>
-              <td>{author.name}</td>
-              <td>{author.bio || "—"}</td>
-              <td>
-                <button onClick={() => alert("TODO: Edit Author")}>✏️ Edit</button>
-                <button onClick={() => handleDelete(author.id)}>🗑 Delete</button>
-              </td>
+        <table>
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Genre ID</th>
+              <th>Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {authors.map((author) => (
+              <tr key={author.authorId}>
+                <td>{author.authorName}</td>
+                <td>{author.genreId}</td>
+                <td>
+                  <button
+                    onClick={() => {
+                      setEditingAuthor(author);
+                      setShowForm(true);
+                    }}
+                  >
+                    ✏️ Edit
+                  </button>
+                  <button
+                    className="delete"
+                    onClick={() => handleDelete(author.authorId)}
+                  >
+                    🗑 Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {showForm && (
+        <AuthorForm
+          onSubmit={handleFormSubmit}
+          onClose={() => {
+            setShowForm(false);
+            setEditingAuthor(null);
+          }}
+          initialData={editingAuthor || undefined}
+        />
+      )}
     </div>
   );
 }

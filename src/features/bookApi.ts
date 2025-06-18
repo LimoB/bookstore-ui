@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export interface Book {
+  publishedDate: string;
   bookId: number;
   title: string;
   description?: string;
@@ -10,14 +11,12 @@ export interface Book {
   createdAt?: string;
   updatedAt?: string;
 
-  // Related author (optional)
   author?: {
     authorId: number;
     authorName: string;
     genreId: number;
   };
 
-  // Related owners (optional)
   owners?: {
     bookOwnerId: number;
     ownerId: number;
@@ -25,6 +24,7 @@ export interface Book {
       userId: number;
       fullName: string;
       email: string;
+      userType?: string; // include this if needed
     };
   }[];
 }
@@ -41,7 +41,7 @@ export const bookApi = createApi({
   reducerPath: "bookApi",
   baseQuery: fetchBaseQuery({
     baseUrl: "http://localhost:5000/api",
-    prepareHeaders: (headers) => {
+    prepareHeaders: (headers, { }) => {
       const token = localStorage.getItem("token");
       if (token) {
         headers.set("Authorization", `Bearer ${token}`);
@@ -84,7 +84,7 @@ export const bookApi = createApi({
         url: `/book/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["Book"],
+      invalidatesTags: (_result, _error, id) => [{ type: "Book", id }],
     }),
   }),
 });

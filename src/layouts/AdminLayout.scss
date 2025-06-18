@@ -1,0 +1,91 @@
+/* src/layouts/AdminLayout.scss */
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #e0e7ff 0%, #f3e8ff 100%);
+  font-family: 'Segoe UI', sans-serif;
+  animation: fadeIn 0.6s ease-in;
+
+  .sidebar {
+    width: 240px;
+    background-color: #4c51bf;
+    color: white;
+    padding: 2rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.05);
+
+    h2 {
+      margin-bottom: 2rem;
+      font-size: 1.75rem;
+      font-weight: bold;
+      color: #fff;
+      animation: slideDown 0.4s ease-in-out;
+    }
+
+    nav ul {
+      list-style: none;
+      padding: 0;
+
+      li {
+        margin-bottom: 1rem;
+
+        a {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          font-size: 1rem;
+          color: #edf2ff;
+          text-decoration: none;
+          padding: 0.6rem 0.9rem;
+          border-radius: 8px;
+          transition: background-color 0.3s ease;
+
+          &:hover {
+            background-color: #6b46c1;
+            text-decoration: none;
+          }
+        }
+      }
+    }
+  }
+
+  .content {
+    flex: 1;
+    padding: 2rem;
+    background-color: #f9faff;
+    border-left: 1px solid #e0e7ff;
+    animation: fadeIn 0.6s ease-in;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+.sidebar a.active {
+  background-color: #6b46c1;
+  color: #fff;
+  font-weight: 600;
+}
+

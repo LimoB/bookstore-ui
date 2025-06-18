@@ -1,11 +1,10 @@
-// src/features/userApi.ts
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export interface User {
   userId: number;
   fullName: string;
   email: string;
-  role: string; // e.g. 'admin', 'member', 'author'
+  user_type: string; // <-- Changed from 'role'
   createdAt?: string;
   updatedAt?: string;
 }
@@ -14,14 +13,14 @@ export interface CreateUserInput {
   fullName: string;
   email: string;
   password: string;
-  role?: string;
+  user_type?: string; // <-- Changed from 'role'
 }
 
 export interface UpdateUserInput {
   fullName?: string;
   email?: string;
   password?: string;
-  role?: string;
+  user_type?: string; // <-- Changed from 'role'
 }
 
 export const userApi = createApi({

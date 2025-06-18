@@ -4,74 +4,77 @@ import { fetchUsers, deleteUser } from "../../services/user";
 import "./ManageUsers.scss";
 
 interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: "admin" | "author" | "member";
+    userId: number;
+    fullName: string;
+    email: string;
+    user_type: "admin" | "author" | "member";
 }
 
 export default function ManageUsers() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+    const [users, setUsers] = useState<User[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
-  const loadUsers = async () => {
-    try {
-      setLoading(true);
-      const res = await fetchUsers();
-      setUsers(res.data);
-    } catch (err) {
-      setError("Failed to load users.");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const loadUsers = async () => {
+        try {
+            setLoading(true);
+            const res = await fetchUsers();
+            setUsers(res.data);
+        } catch (err) {
+            setError("Failed to load users.");
+        } finally {
+            setLoading(false);
+        }
+    };
+    const handleDelete = async (id: number) => {
+        const confirmDelete = window.confirm("Are you sure you want to delete this user?");
+        if (!confirmDelete) return;
 
-  const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this user?")) return;
-    try {
-      await deleteUser(id);
-      setUsers(users.filter((u) => u.id !== id));
-    } catch {
-      alert("Failed to delete user.");
-    }
-  };
+        try {
+            await deleteUser(id.toString());
+            setUsers((prevUsers) => prevUsers.filter((user) => user.userId !== id));
+        } catch (error) {
+            console.error("Delete user failed:", error);
+            alert("Failed to delete user.");
+        }
+    };
 
-  useEffect(() => {
-    loadUsers();
-  }, []);
 
-  return (
-    <div className="manage-users">
-      <h2>Manage Users</h2>
-      <button onClick={() => alert("TODO: Open user creation form")}>➕ Add User</button>
+    useEffect(() => {
+        loadUsers();
+    }, []);
 
-      {loading && <p>Loading...</p>}
-      {error && <p>{error}</p>}
+    return (
+        <div className="manage-users">
+            <h2>Manage Users</h2>
+            <button onClick={() => alert("TODO: Open user creation form")}>➕ Add User</button>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user) => (
-            <tr key={user.id}>
-              <td>{user.name || "—"}</td>
-              <td>{user.email}</td>
-              <td>{user.role}</td>
-              <td>
-                <button onClick={() => alert("TODO: Edit User")}>✏️ Edit</button>
-                <button onClick={() => handleDelete(user.id)}>🗑 Delete</button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+            {loading && <p>Loading...</p>}
+            {error && <p>{error}</p>}
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email</th>
+                        <th>User Type</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {users.map((user) => (
+                        <tr key={user.userId}>
+                            <td>{user.fullName || "—"}</td>
+                            <td>{user.email}</td>
+                            <td>{user.user_type}</td>
+                            <td>
+                                <button onClick={() => alert("TODO: Edit User")}>✏️ Edit</button>
+                                <button onClick={() => handleDelete(user.userId)}>🗑 Delete</button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
 }
