@@ -8,7 +8,6 @@ import {
 } from "../../features/authorApi";
 import {
   useGetAllGenresQuery,
-  type Genre,
 } from "../../features/genreApi";
 import AuthorForm from "./components/AuthorForm";
 import "./ManageAuthors.scss";
