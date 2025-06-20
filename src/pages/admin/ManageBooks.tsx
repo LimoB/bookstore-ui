@@ -1,5 +1,3 @@
-// src/pages/admin/ManageBooks.tsx
-import { useForm } from "react-hook-form";
 import { useState } from "react";
 import "./Book.scss";
 import {
@@ -10,47 +8,23 @@ import {
   type Book as BookType,
 } from "../../features/bookApi";
 
-import {
-  useGetAllAuthorsQuery,
-  type Author,
-} from "../../features/authorApi";
+import { useGetAllAuthorsQuery } from "../../features/authorApi";
 
-type BookFormInput = {
-  title: string;
-  publicationYear: number;
-  authorId: number;
-  description?: string;
-  isbn?: string;
-  publishedDate: string;
-};
+import BookForm, { type BookFormInput } from "./components/BookForm";
 
 export const BookManager = () => {
-  const {
-    register,
-    handleSubmit,
-    reset,
-    setValue,
-    formState: { errors },
-  } = useForm<BookFormInput>();
-
-  const {
-    data: books = [],
-    isLoading,
-    isError,
-    refetch,
-  } = useGetBooksQuery();
-
+  const { data: books = [], isLoading, isError, refetch } = useGetBooksQuery();
   const {
     data: authors = [],
     isLoading: authorsLoading,
     isError: authorsError,
   } = useGetAllAuthorsQuery();
 
-  const [createBook] = useCreateBookMutation();
-  const [updateBook] = useUpdateBookMutation();
+  const [createBook, { isLoading: isCreating }] = useCreateBookMutation();
+  const [updateBook, { isLoading: isUpdating }] = useUpdateBookMutation();
   const [deleteBook] = useDeleteBookMutation();
 
-  const [editId, setEditId] = useState<number | null>(null);
+  const [editBook, setEditBook] = useState<BookType | null>(null);
   const [toast, setToast] = useState<string>("");
 
   const showToast = (msg: string) => {
@@ -58,7 +32,7 @@ export const BookManager = () => {
     setTimeout(() => setToast(""), 3000);
   };
 
-  const onSubmit = async (data: BookFormInput) => {
+  const handleSubmit = async (data: BookFormInput) => {
     try {
       const payload = {
         title: data.title,
@@ -69,31 +43,20 @@ export const BookManager = () => {
         publicationYear: Number(data.publicationYear),
       };
 
-      if (editId !== null) {
-        await updateBook({ id: editId, data: payload }).unwrap();
+      if (editBook) {
+        await updateBook({ id: editBook.bookId, data: payload }).unwrap();
         showToast("✅ Book updated!");
       } else {
         await createBook(payload).unwrap();
         showToast("✅ Book added!");
       }
 
-      reset();
-      setEditId(null);
+      setEditBook(null);
       refetch();
     } catch (err: any) {
-      console.error("Book submit error:", err?.response?.data || err);
-      showToast("❌ Error performing action");
+      console.error("Book submit error:", err);
+      showToast("❌ Error saving book");
     }
-  };
-
-  const handleEdit = (book: BookType) => {
-    setValue("title", book.title);
-    setValue("publicationYear", book.publicationYear || 0);
-    setValue("authorId", book.authorId);
-    setValue("description", book.description || "");
-    setValue("isbn", book.isbn || "");
-    setValue("publishedDate", book.publishedDate || "");
-    setEditId(book.bookId);
   };
 
   const handleDelete = async (id: number) => {
@@ -127,14 +90,20 @@ export const BookManager = () => {
             </thead>
             <tbody>
               {books.map((book, idx) => (
-                <tr key={book.bookId}>
+                <tr
+                  key={book.bookId}
+                  className={editBook?.bookId === book.bookId ? "highlighted" : ""}
+                >
                   <td>{idx + 1}</td>
                   <td>{book.title}</td>
                   <td>{book.publicationYear}</td>
                   <td>{book.author?.authorName ?? `ID: ${book.authorId}`}</td>
                   <td>
-                    <button onClick={() => handleEdit(book)}>✏️ Edit</button>
-                    <button className="delete" onClick={() => handleDelete(book.bookId)}>
+                    <button onClick={() => setEditBook(book)}>✏️ Edit</button>
+                    <button
+                      className="delete"
+                      onClick={() => handleDelete(book.bookId)}
+                    >
                       🗑️ Delete
                     </button>
                   </td>
@@ -148,63 +117,20 @@ export const BookManager = () => {
       </div>
 
       <div className="book-form-wrapper">
-        <h3>{editId ? "✏️ Edit Book" : "➕ Add Book"}</h3>
-        <form className="book-form" onSubmit={handleSubmit(onSubmit)}>
-          <input
-            type="text"
-            placeholder="Book Title"
-            {...register("title", { required: true })}
+        <h3>{editBook ? "✏️ Edit Book" : "➕ Add Book"}</h3>
+        {authorsLoading ? (
+          <p>Loading authors...</p>
+        ) : authorsError ? (
+          <p className="error-message">Failed to load authors</p>
+        ) : (
+          <BookForm
+            onSubmit={handleSubmit}
+            initialData={editBook || undefined}
+            authors={authors}
+            isLoading={isCreating || isUpdating}
           />
-          {errors.title && <span className="error">Title is required.</span>}
-
-          <input
-            type="number"
-            placeholder="Publication Year"
-            {...register("publicationYear", { required: true })}
-          />
-          {errors.publicationYear && <span className="error">Year is required.</span>}
-
-          {authorsLoading ? (
-            <p>Loading authors...</p>
-          ) : authorsError ? (
-            <p className="error-message">Failed to load authors</p>
-          ) : (
-            <select {...register("authorId", { required: true })}>
-              <option value="">Select Author</option>
-              {authors.map((author: Author) => (
-                <option key={author.authorId} value={author.authorId}>
-                  {author.authorName}
-                </option>
-              ))}
-            </select>
-          )}
-          {errors.authorId && <span className="error">Author is required.</span>}
-
-          <input
-            type="text"
-            placeholder="Description (optional)"
-            {...register("description")}
-          />
-
-          <input
-            type="text"
-            placeholder="ISBN (optional)"
-            {...register("isbn")}
-          />
-
-          <input
-            type="date"
-            placeholder="Published Date"
-            {...register("publishedDate", { required: true })}
-          />
-          {errors.publishedDate && <span className="error">Published date is required.</span>}
-
-          <button type="submit">
-            {editId !== null ? "Update Book" : "Add Book"}
-          </button>
-        </form>
-
-        {toast && <div className="toast">{toast}</div>}
+        )}
+        {toast && <div className="toast show">{toast}</div>}
       </div>
     </div>
   );

@@ -6,11 +6,13 @@ import {
   useDeleteAuthorMutation,
   type Author,
 } from "../../features/authorApi";
-import {
-  useGetAllGenresQuery,
-} from "../../features/genreApi";
+import { useGetAllGenresQuery } from "../../features/genreApi";
 import AuthorForm from "./components/AuthorForm";
-import "./ManageAuthors.scss";
+
+interface AuthorFormInput {
+  authorName: string;
+  genreId: number;
+}
 
 export default function ManageAuthors() {
   const {
@@ -31,11 +33,13 @@ export default function ManageAuthors() {
 
   const [editingAuthor, setEditingAuthor] = useState<Author | null>(null);
 
-  const genreMap = useMemo(() => {
-    return new Map<number, string>(
-      genres.map(({ genreId, genreName }) => [genreId, genreName])
-    );
-  }, [genres]);
+  const genreMap = useMemo(
+    () =>
+      new Map<number, string>(
+        genres.map(({ genreId, genreName }) => [genreId, genreName])
+      ),
+    [genres]
+  );
 
   useEffect(() => {
     if (authorsError || genresError) {
@@ -47,9 +51,7 @@ export default function ManageAuthors() {
   }, [authorsError, genresError]);
 
   const handleDelete = async (authorId: number) => {
-    const confirmed = confirm("Are you sure you want to delete this author?");
-    if (!confirmed) return;
-
+    if (!confirm("Are you sure you want to delete this author?")) return;
     try {
       await deleteAuthor(authorId).unwrap();
     } catch (error) {
@@ -58,10 +60,8 @@ export default function ManageAuthors() {
     }
   };
 
-  const handleFormSubmit = async (authorData: Partial<Author>) => {
-    const { authorName, genreId } = authorData;
-
-    if (!authorName?.trim() || !genreId) {
+  const handleFormSubmit = async ({ authorName, genreId }: AuthorFormInput) => {
+    if (!authorName.trim() || !genreId) {
       alert("Author name and genre are required.");
       return;
     }
@@ -86,7 +86,7 @@ export default function ManageAuthors() {
     if (authors.length === 0) {
       return (
         <tr>
-          <td colSpan={3} className="text-center">
+          <td colSpan={3} className="text-center py-4 text-gray-500 border">
             No authors found.
           </td>
         </tr>
@@ -97,25 +97,33 @@ export default function ManageAuthors() {
       const genreName = genreMap.get(author.genreId);
 
       return (
-        <tr key={author.authorId}>
-          <td>{author.authorName || <span className="text-muted">Unnamed</span>}</td>
-          <td>
-            {author.genreId} –{" "}
-            {genreName || <span className="text-danger">Unknown Genre</span>}
+        <tr
+          key={author.authorId}
+          className="hover:bg-indigo-100 even:bg-indigo-50 transition animate-slideUpFade"
+        >
+          <td className="px-4 py-3 border">
+            {author.authorName || (
+              <span className="text-gray-400 italic">Unnamed</span>
+            )}
           </td>
-          <td>
+          <td className="px-4 py-3 border">
+            {author.genreId} –{" "}
+            {genreName || (
+              <span className="text-red-500 italic">Unknown Genre</span>
+            )}
+          </td>
+          <td className="px-4 py-3 border flex gap-2">
             <button
               onClick={() => setEditingAuthor(author)}
               disabled={isCreating || isUpdating}
-              aria-label="Edit author"
+              className="bg-purple-600 text-white px-3 py-1.5 rounded-md text-sm hover:bg-purple-700 transition"
             >
               ✏️ Edit
             </button>
             <button
-              className="delete"
               onClick={() => handleDelete(author.authorId)}
               disabled={isDeleting}
-              aria-label="Delete author"
+              className="bg-red-500 text-white px-3 py-1.5 rounded-md text-sm hover:bg-red-600 transition"
             >
               🗑 Delete
             </button>
@@ -129,25 +137,34 @@ export default function ManageAuthors() {
   const hasError = !!authorsError || !!genresError;
 
   return (
-    <div className="manage-authors">
-      <div className="author-table-wrapper">
-        <h2>Manage Authors</h2>
+    <div className="flex flex-wrap gap-8 justify-between items-start p-8 min-h-screen bg-gradient-to-br from-indigo-100 to-purple-100 animate-fadeIn">
+      {/* Author Table */}
+      <div className="flex-1 min-w-[320px] max-w-[60%]">
+        <h2 className="text-2xl text-indigo-700 mb-6 animate-slideDown">
+          Manage Authors
+        </h2>
 
         {isLoading && <p>Loading authors and genres...</p>}
 
         {hasError && (
-          <p className="error">
+          <p className="text-red-600 font-semibold mt-4">
             ❌ Failed to load authors or genres. Please try refreshing the page.
           </p>
         )}
 
         {!isLoading && !hasError && (
-          <table>
+          <table className="w-full border border-gray-300 border-collapse rounded-xl overflow-hidden shadow text-sm animate-fadeIn">
             <thead>
-              <tr>
-                <th>Name</th>
-                <th>Genre</th>
-                <th>Actions</th>
+              <tr className="bg-indigo-600 text-white font-semibold text-base">
+                <th className="px-4 py-3 text-left border border-gray-300">
+                  Name
+                </th>
+                <th className="px-4 py-3 text-left border border-gray-300">
+                  Genre
+                </th>
+                <th className="px-4 py-3 text-left border border-gray-300">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>{renderAuthorRows()}</tbody>
@@ -155,13 +172,28 @@ export default function ManageAuthors() {
         )}
       </div>
 
-      <div className="author-form-wrapper">
-        <h3>{editingAuthor ? "Edit Author" : "Add Author"}</h3>
+      {/* Author Form */}
+      <div className="flex-1 min-w-[280px] max-w-[35%] flex flex-col items-center p-6 animate-fadeIn">
+        <h3 className="text-2xl text-indigo-700 mb-6 animate-slideDown">
+          {editingAuthor ? "✏️ Edit Author" : "➕ Add Author"}
+        </h3>
+
         <AuthorForm
           onSubmit={handleFormSubmit}
           onClose={() => setEditingAuthor(null)}
-          initialData={editingAuthor ?? undefined}
+          initialData={
+            editingAuthor
+              ? {
+                authorName: editingAuthor.authorName,
+                genreId: editingAuthor.genreId,
+              }
+              : undefined
+          }
+          isLoading={isCreating || isUpdating}
+          genres={genres}
+          existingAuthors={authors}
         />
+
       </div>
     </div>
   );

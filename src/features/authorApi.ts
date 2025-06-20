@@ -6,6 +6,18 @@ export interface Author {
   genreId: number;
   createdAt?: string;
   updatedAt?: string;
+  genre?: {
+    genreName: string;
+  };
+  books?: {
+    bookId: number;
+    title: string;
+    description: string;
+    isbn: string;
+    publicationYear: number;
+    createdAt: string;
+    updatedAt: string;
+  }[];
 }
 
 export interface CreateAuthorInput {
@@ -17,22 +29,6 @@ export interface UpdateAuthorInput {
   authorName?: string;
   genreId?: number;
 }
-
-interface AuthorApiResponse {
-  author_id: number;
-  author_name: string;
-  genre_id: number;
-  created_at?: string;
-  updated_at?: string;
-}
-
-const transformAuthor = (data: AuthorApiResponse): Author => ({
-  authorId: data.author_id,
-  authorName: data.author_name,
-  genreId: data.genre_id,
-  createdAt: data.created_at,
-  updatedAt: data.updated_at,
-});
 
 export const authorApi = createApi({
   reducerPath: "authorApi",
@@ -50,20 +46,6 @@ export const authorApi = createApi({
   endpoints: (builder) => ({
     getAllAuthors: builder.query<Author[], void>({
       query: () => "/authors",
-      transformResponse: (
-        response: { data: AuthorApiResponse[] } | AuthorApiResponse[]
-      ): Author[] => {
-        const rawAuthors = Array.isArray(response)
-          ? response
-          : response?.data ?? [];
-
-        return rawAuthors
-          .filter(
-            (a): a is AuthorApiResponse =>
-              !!a?.author_id && !!a?.author_name && !!a?.genre_id
-          )
-          .map(transformAuthor);
-      },
       providesTags: (result) =>
         result
           ? [
@@ -78,12 +60,6 @@ export const authorApi = createApi({
 
     getAuthorById: builder.query<Author, number>({
       query: (id) => `/authors/${id}`,
-      transformResponse: (
-        response: { data: AuthorApiResponse } | AuthorApiResponse
-      ): Author => {
-        const raw = (response as any)?.data ?? response;
-        return transformAuthor(raw);
-      },
       providesTags: (_result, _error, id) => [{ type: "Author", id }],
     }),
 
@@ -93,12 +69,6 @@ export const authorApi = createApi({
         method: "POST",
         body: author,
       }),
-      transformResponse: (
-        response: { data: AuthorApiResponse } | AuthorApiResponse
-      ): Author => {
-        const raw = (response as any)?.data ?? response;
-        return transformAuthor(raw);
-      },
       invalidatesTags: [{ type: "Author", id: "LIST" }],
     }),
 
@@ -111,12 +81,6 @@ export const authorApi = createApi({
         method: "PUT",
         body: data,
       }),
-      transformResponse: (
-        response: { data: AuthorApiResponse } | AuthorApiResponse
-      ): Author => {
-        const raw = (response as any)?.data ?? response;
-        return transformAuthor(raw);
-      },
       invalidatesTags: (_result, _error, { id }) => [
         { type: "Author", id },
         { type: "Author", id: "LIST" },
